@@ -9,18 +9,18 @@ const userController = {
      * points to /api/thoughts
      * getting all thoughts
      */
-    gettingAllThoughts(req, res) {
-        Thought.find({})
+    gettingAllUsers(req, res) {
+        User.find({})
             //allows the nested documents to expand
             .populate({
-                path: "reactions",
+                path: "friends",
                 select: "-__v"
             })
             .select("-__v")
-            .then((thoughtData) => res.status(200).json(thoughtData))
+            .then((userData) => res.status(200).json(userData))
             .catch((err) => {
                 console.log(err);
-                res.status(400).json({message: 'Could not find thoughts'})
+                res.status(400).json({message: 'Could not find users'})
             });
     },
 
@@ -28,18 +28,22 @@ const userController = {
      * points to /api/thoughts/:id
      * getting a single thought by id parameter
      */
-    getOneThoughtByID(req, res) {
-        Thought.findOne({_id: req.params.id})
+    getOneUserByID(req, res) {
+        User.findOne({_id: req.params.id})
             .populate({
-                path: 'reactions',
+                path: 'friends',
+                select: "-__v"
+            })
+            .populate({
+                path: 'thoughts',
                 select: "-__v"
             })
             .select("-__v")
-            .then((thoughtData) => {
-                if(!thoughtData) {
-                    return res.status(404).json({message: "Sorry! No thoughts associated with this id"})
+            .then((userData) => {
+                if(!userData) {
+                    return res.status(404).json({message: "Sorry! No user associated with this id"})
                 }
-                return res.status(200).json(thoughtData);
+                return res.status(200).json(userData);
             })
             .catch((err) => {
                 console.log(err);
@@ -52,21 +56,13 @@ const userController = {
      * creating a thought 
      * also pushes the thought's _id to user's thoughts field
      */
-    createNewThought(req, res) {
-        Thought.create(req.body)
-            .then(({_id}) => {
-                //here is where it connects with User
-                return User.findOneAndUpdate(
-                    {_id: req.body.userId},
-                    {$push: {thoughts: _id}},
-                    {new: true}
-                );
-            })
+    createNewUser(req, res) {
+        User.create(req.body)
             .then((userThoughtData) => {
                 if (!userThoughtData) {
-                    return res.status(404).json({message: "Created thought...No user associated with id"});
+                    return res.status(404).json({message: "Created User...No user associated with id"});
                 }
-                res.status(200).json({message: "Created thought...Found User"});
+                res.status(200).json({message: "Created User...Found User"});
             })
             .catch((err) => {
                 console.log(err);
@@ -78,13 +74,13 @@ const userController = {
     /**
      * updating a thought by the id
      */
-    updatingThought(req ,res) {
-        Thought.findOneAndUpdate(
+    updatingUser(req ,res) {
+        User.findOneAndUpdate(
             { _id: req.params.videoId },
-            { $set: req.body },
+            req.body,
             { runValidators: true, new: true }) //new: after update, see the updated object
-            .then((thoughtData) => {
-                if (!userThoughtData) {
+            .then((userData) => {
+                if (!userData) {
                     return res.status(404).json({message: "Could not update thought...No thought with that id"});
                 }
                 res.status(200).json({message: "Updated thought!...Found User"});
@@ -98,25 +94,18 @@ const userController = {
     /**
      * deleting a thought by the ID
      */
-    deletingThought(req, res) {
-        Thought.findOneAndRemove({_id: req.body.id})
-            .then((thoughtData) => {
-                if (!dbThoughtData) {
-                    return res.status(404).json({ message: "No thought with this id!" });
-                  }
-
-                //this is where the thought id from users thought fiels is deleted
-                return User.findOneAndUpdate(
-                    {thoughts: req.body.id},
-                    {$pull: {thoughts: req.body.id}},
-                    {new: true}
+    deletingUser(req, res) {
+        Thought.deleteMany({userId: req.params.id})
+            .then(() => {
+             User.findOneAndDelete(
+                    {userId: req.params.id},                  
                 );
             })
-            .then((thoughtData) => {
-                if (!userThoughtData) {
-                    return res.status(404).json({message: "Could not delete thought...No thought with that id"});
+            .then((userData) => {
+                if (!userData) {
+                    return res.status(404).json({message: "Could not delete user...No user with that id"});
                 }
-                res.status(200).json({message: "Deleted thought!...Found User"});
+                res.status(200).json({message: "Deleted user!...Found User"});
             })
             .catch((err) => {
                 console.log(err);
@@ -124,21 +113,21 @@ const userController = {
             });
     },
     
-    //----------------------------------------------------------REACTIONS CRUD METHODS--------------------------------------------------
+    //----------------------------------------------------------FRIENDS CRUD METHODS--------------------------------------------------
 
     /**
-     * adding a reaction
+     * adding a friend
      */
-    addingReaction(req, res) {
-        Thought.findOneAndUpdate(
-            {_id: req.body.thoughtId},
-            {$addToSet: {reactions: req.body}},
-            {runValidators: true, new: true})
-            .then((thoughtData) => {
-                if (!userThoughtData) {
-                    return res.status(404).json({message: "Could not add reaction...No thought with that id"});
+    addingFriend(req, res) {
+        User.findOneAndUpdate(
+            {_id: req.params.userId},
+            {$push: {friends: req.params.friendId}},
+            {new: true})
+            .then((userData) => {
+                if (!userData) {
+                    return res.status(404).json({message: "Could not add reaction...No user with that id"});
                 }
-                res.status(200).json({message: "Added a reaction!...Found User"});
+                res.status(200).json({message: "Added a friend!...Found User"});
             })
             .catch((err) => {
                 console.log(err);
@@ -150,15 +139,15 @@ const userController = {
      * deleting a reaction
      */
     deletingReaction(req, res) {
-        Thought.findOneAndUpdate(
-            {_id: req.body.thoughtId},
-            {$pull: {reactions:{reactionId: req.body.reactionId}}},
+        User.findOneAndUpdate(
+            {_id: req.params.userId},
+            {$pull: {friends: req.params.friendId}},
             {new: true})
-            .then((thoughtData) => {
-                if (!userThoughtData) {
-                    return res.status(404).json({message: "Could not delete reaction...No thought with that id"});
+            .then((userData) => {
+                if (!userData) {
+                    return res.status(404).json({message: "Could not delete friend...No user with that id"});
                 }
-                res.status(200).json({message: "Deleted a reaction!...Found User"});
+                res.status(200).json({message: "Deleted a friend!...Found User"});
             })
             .catch((err) => {
                 console.log(err);

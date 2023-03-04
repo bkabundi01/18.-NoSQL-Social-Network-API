@@ -81,7 +81,7 @@ const thoughtController = {
     updatingThought(req ,res) {
         Thought.findOneAndUpdate(
             { _id: req.params.videoId },
-            { $set: req.body },
+            req.body,
             { runValidators: true, new: true }) //new: after update, see the updated object
             .then((thoughtData) => {
                 if (!thoughtData) {
@@ -99,7 +99,7 @@ const thoughtController = {
      * deleting a thought by the ID
      */
     deletingThought(req, res) {
-        Thought.findOneAndRemove({_id: req.body.id})
+        Thought.findOneAndRemove({_id: req.params.id})
             .then((thoughtData) => {
                 if (!thoughtData) {
                     return res.status(404).json({ message: "No thought with this id!" });
@@ -107,8 +107,8 @@ const thoughtController = {
 
                 //this is where the thought id from users thought fiels is deleted
                 return User.findOneAndUpdate(
-                    {thoughts: req.body.id},
-                    {$pull: {thoughts: req.body.id}},
+                    {thoughts: req.params.id},
+                    {$pull: {thoughts: req.params.id}},
                     {new: true}
                 );
             })
@@ -131,7 +131,7 @@ const thoughtController = {
      */
     addingReaction(req, res) {
         Thought.findOneAndUpdate(
-            {_id: req.body.thoughtId},
+            {_id: req.params.thoughtId},
             {$addToSet: {reactions: req.body}},
             {runValidators: true, new: true})
             .then((thoughtData) => {
@@ -151,8 +151,8 @@ const thoughtController = {
      */
     deletingReaction(req, res) {
         Thought.findOneAndUpdate(
-            {_id: req.body.thoughtId},
-            {$pull: {reactions:{reactionId: req.body.reactionId}}},
+            {_id: req.params.thoughtId},
+            {$pull: {reactions:{reactionId: req.params.reactionId}}},
             {new: true})
             .then((thoughtData) => {
                 if (!thoughtData) {
