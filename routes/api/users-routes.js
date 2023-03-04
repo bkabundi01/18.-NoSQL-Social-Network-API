@@ -1,6 +1,6 @@
 //require Router() from express
 const router = require('express').Router();
-//require all of the methods from the users controller
+//require all of the methods for CRUD from the users controller
 const {
 
 } = require('../../controllers/userController');
