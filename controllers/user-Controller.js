@@ -6,8 +6,8 @@ const {User, Thought} = require('../models');
 const userController = {
 
     /**
-     * points to /api/thoughts
-     * getting all thoughts
+     * points to /api/users
+     * getting all users
      */
     gettingAllUsers(req, res) {
         User.find({})
@@ -25,8 +25,8 @@ const userController = {
     },
 
     /**
-     * points to /api/thoughts/:id
-     * getting a single thought by id parameter
+     * points to /api/users/:id
+     * getting a single user by id parameter
      */
     getOneUserByID(req, res) {
         User.findOne({_id: req.params.id})
@@ -53,8 +53,8 @@ const userController = {
 
 
     /**
-     * creating a thought 
-     * also pushes the thought's _id to user's thoughts field
+     * creating a user
+     * points to /api/users
      */
     createNewUser(req, res) {
         User.create(req.body)
@@ -72,7 +72,8 @@ const userController = {
 
 
     /**
-     * updating a thought by the id
+     * updating a user by the id
+     * /api/users/:id
      */
     updatingUser(req ,res) {
         User.findOneAndUpdate(
@@ -92,7 +93,8 @@ const userController = {
     },
 
     /**
-     * deleting a thought by the ID
+     * deleting a user by the ID
+     * /api/users/:id
      */
     deletingUser(req, res) {
         Thought.deleteMany({userId: req.params.id})
@@ -136,9 +138,9 @@ const userController = {
     },
 
     /**
-     * deleting a reaction
+     * deleting a friend
      */
-    deletingReaction(req, res) {
+    deletingFriend(req, res) {
         User.findOneAndUpdate(
             {_id: req.params.userId},
             {$pull: {friends: req.params.friendId}},

@@ -1,9 +1,15 @@
 //require Router() from express and all the methods for CRUD from thought controller
 const router = require('express').Router();
 const {
-
+    gettingAllThoughts, 
+    getOneThoughtByID, 
+    createNewThought, 
+    updatingThought, 
+    deletingThought,
+    addingReaction,
+    deletingReaction
 } = require('../../controllers/thought-Controller');
-
+ 
 
 /**
  * getting all thoughts/creating a new thought
