@@ -84,7 +84,7 @@ const thoughtController = {
             { $set: req.body },
             { runValidators: true, new: true }) //new: after update, see the updated object
             .then((thoughtData) => {
-                if (!userThoughtData) {
+                if (!thoughtData) {
                     return res.status(404).json({message: "Could not update thought...No thought with that id"});
                 }
                 res.status(200).json({message: "Updated thought!...Found User"});
@@ -101,7 +101,7 @@ const thoughtController = {
     deletingThought(req, res) {
         Thought.findOneAndRemove({_id: req.body.id})
             .then((thoughtData) => {
-                if (!dbThoughtData) {
+                if (!thoughtData) {
                     return res.status(404).json({ message: "No thought with this id!" });
                   }
 
@@ -113,7 +113,7 @@ const thoughtController = {
                 );
             })
             .then((thoughtData) => {
-                if (!userThoughtData) {
+                if (!thoughtData) {
                     return res.status(404).json({message: "Could not delete thought...No thought with that id"});
                 }
                 res.status(200).json({message: "Deleted thought!...Found User"});
@@ -135,7 +135,7 @@ const thoughtController = {
             {$addToSet: {reactions: req.body}},
             {runValidators: true, new: true})
             .then((thoughtData) => {
-                if (!userThoughtData) {
+                if (!thoughtData) {
                     return res.status(404).json({message: "Could not add reaction...No thought with that id"});
                 }
                 res.status(200).json({message: "Added a reaction!...Found User"});
@@ -155,7 +155,7 @@ const thoughtController = {
             {$pull: {reactions:{reactionId: req.body.reactionId}}},
             {new: true})
             .then((thoughtData) => {
-                if (!userThoughtData) {
+                if (!thoughtData) {
                     return res.status(404).json({message: "Could not delete reaction...No thought with that id"});
                 }
                 res.status(200).json({message: "Deleted a reaction!...Found User"});
