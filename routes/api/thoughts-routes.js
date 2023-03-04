@@ -25,7 +25,7 @@ router.route('/:id').get(getOneThoughtByID).put(updatingThought).delete(deleting
 
 /**
  * create a reaction/ delete a reaction
- * url here is localhost:3001/api/thoughts/:thoughtId/reactions/:reactionId
+ * url here is localhost:3001/api/thoughts/:thoughtId/reactions/:reactionId 
  */
 router.route('/:thoughtId/reactions').post(addingReaction).delete(deletingReaction);
 

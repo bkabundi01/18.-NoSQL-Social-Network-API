@@ -19,6 +19,7 @@ router.route('/').get(gettingAllUsers).post(createNewUser);
 
 /**
  * getting, updating, and deleting a user by _id
+ * url here is localhost:3001/api/users/:id
  */
 router.route('/:id').get(getOneUserByID).put(updatingUser).delete(deletingUser);
 

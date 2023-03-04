@@ -57,7 +57,7 @@ const thoughtController = {
             .then(({_id}) => {
                 //here is where it connects with User
                 return User.findOneAndUpdate(
-                    {_id: req.body.userId},
+                    {_id: req.body.id},
                     {$push: {thoughts: _id}},
                     {new: true}
                 );
@@ -80,7 +80,7 @@ const thoughtController = {
      */
     updatingThought(req ,res) {
         Thought.findOneAndUpdate(
-            { _id: req.params.videoId },
+            { _id: req.params.id },
             req.body,
             { runValidators: true, new: true }) //new: after update, see the updated object
             .then((thoughtData) => {

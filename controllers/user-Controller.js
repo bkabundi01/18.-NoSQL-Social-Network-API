@@ -62,7 +62,7 @@ const userController = {
                 if (!userThoughtData) {
                     return res.status(404).json({message: "Created User...No user associated with id"});
                 }
-                res.status(200).json({message: "Created User...Found User"});
+                res.status(200).json({message: `Created User: ${userThoughtData.username}!!🎉`});
             })
             .catch((err) => {
                 console.log(err);
@@ -77,14 +77,14 @@ const userController = {
      */
     updatingUser(req ,res) {
         User.findOneAndUpdate(
-            { _id: req.params.videoId },
+            { _id: req.params.id },
             req.body,
             { runValidators: true, new: true }) //new: after update, see the updated object
             .then((userData) => {
                 if (!userData) {
-                    return res.status(404).json({message: "Could not update thought...No thought with that id"});
+                    return res.status(404).json({message: "Could not update user...No thought with that id"});
                 }
-                res.status(200).json({message: "Updated thought!...Found User"});
+                res.status(200).json({message: "Updated user!"});
             })
             .catch((err) => {
                 console.log(err);
@@ -97,17 +97,16 @@ const userController = {
      * /api/users/:id
      */
     deletingUser(req, res) {
-        Thought.deleteMany({userId: req.params.id})
-            .then(() => {
-             User.findOneAndDelete(
-                    {userId: req.params.id},                  
-                );
-            })
+        User.findOneAndDelete({_id: req.params.id})
             .then((userData) => {
                 if (!userData) {
                     return res.status(404).json({message: "Could not delete user...No user with that id"});
                 }
-                res.status(200).json({message: "Deleted user!...Found User"});
+                    // {id: req.params.id},                  
+                return Thought.deleteMany({_id: {$in: userData.thoughts}});
+            })
+            .then(() => {
+                res.status(200).json({message: `Deleted user ${this.username}!`});
             })
             .catch((err) => {
                 console.log(err);
@@ -127,9 +126,9 @@ const userController = {
             {new: true})
             .then((userData) => {
                 if (!userData) {
-                    return res.status(404).json({message: "Could not add reaction...No user with that id"});
+                    return res.status(404).json({message: "Could not add friend...No user with that id"});
                 }
-                res.status(200).json({message: "Added a friend!...Found User"});
+                res.status(200).json({message: `User ${userData.username} Added a ${res.friendId} as a Friend!`});
             })
             .catch((err) => {
                 console.log(err);
@@ -149,7 +148,7 @@ const userController = {
                 if (!userData) {
                     return res.status(404).json({message: "Could not delete friend...No user with that id"});
                 }
-                res.status(200).json({message: "Deleted a friend!...Found User"});
+                res.status(200).json({message: "Deleted a friend!"});
             })
             .catch((err) => {
                 console.log(err);
