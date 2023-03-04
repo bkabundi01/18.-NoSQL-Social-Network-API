@@ -3,7 +3,7 @@ const router = require('express').Router();
 //require all of the methods for CRUD from the users controller
 const {
 
-} = require('../../controllers/userController');
+} = require('../../controllers/user-Controller');
 
 /**
  *  getting all users, or creating a new user
